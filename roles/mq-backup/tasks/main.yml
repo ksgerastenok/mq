@@ -1,0 +1,26 @@
+---
+- name: "[Local] mq_backup"
+  block:
+  - name: "[Local] stat"
+    local_action:
+      module: "stat"
+      path: "{{ ansible_install | dirname }}/{{ ansible_install | basename }}"
+      follow: "true"
+    register: "distrib"
+  when:
+  - "((ansible_install is defined))"
+
+- name: "[Hosts] mq_backup"
+  block:
+  - name: "[Hosts] raw"
+    action:
+      module: "raw"
+      _raw_params: "{{ ((ansible_os_family in ['Windows'])) | ternary('[System.Console]::OutputEncoding = [System.Text.Encoding]::GetEncoding(866); $PSDefaultParameterValues[\"*:Encoding\"] = \"default\"; [System.Console]::InputEncoding = [System.Text.Encoding]::GetEncoding(866);', '') }} dmpmqcfg -t all -x all -o mqsc -m {{ ansible_manager }} -r {{ ansible_remote }} -a | tee {{ ansible_user_dir }}/export.{{ inventory_hostname }}.mqsc"
+  - name: "[Hosts] fetch"
+    action:
+      module: "fetch"
+      src: "{{ ansible_user_dir }}/export.{{ inventory_hostname }}.mqsc"
+      dest: "{{ ansible_install | dirname }}/export.{{ inventory_hostname }}.mqsc"
+      flat: "true"
+  when:
+  - "((distrib['stat']['exists']))"

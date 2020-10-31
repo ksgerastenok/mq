@@ -1,0 +1,56 @@
+---
+- name: "[Local] mq_deploy"
+  block:
+  - name: "[Local] stat"
+    local_action:
+      module: "stat"
+      path: "{{ ansible_install | dirname }}/{{ ansible_install | basename }}"
+      follow: "true"
+    register: "distrib"
+  when:
+  - "((ansible_install is defined))"
+
+- name: "[Hosts] mq_deploy"
+  block:
+  - name: "[Hosts] raw"
+    action:
+      module: "raw"
+      _raw_params: "{{ ((ansible_os_family in ['Windows'])) | ternary('[System.Console]::OutputEncoding = [System.Text.Encoding]::GetEncoding(866); $PSDefaultParameterValues[\"*:Encoding\"] = \"default\"; [System.Console]::InputEncoding = [System.Text.Encoding]::GetEncoding(866);', '') }} dmpmqcfg -t all -x all -o mqsc -m {{ ansible_manager }} -r {{ ansible_remote }} -a | tee {{ ansible_user_dir }}/export.{{ inventory_hostname }}.mqsc"
+  - name: "[Hosts] fetch"
+    action:
+      module: "fetch"
+      src: "{{ ansible_user_dir }}/export.{{ inventory_hostname }}.mqsc"
+      dest: "{{ ansible_install | dirname }}/export.{{ inventory_hostname }}.mqsc"
+      flat: "true"
+
+  - name: "[Hosts] template"
+    action:
+      module: "template"
+      src: "{{ ansible_install | dirname }}/{{ ansible_install | basename }}"
+      dest: "{{ ansible_user_dir }}/{{ ansible_install | basename }}"
+      follow: "true"
+  - name: "[Local] compare"
+    local_action:
+      module: "compare"
+      src: "{{ ansible_install | dirname }}/{{ ansible_install | basename }}"
+      dest: "{{ ansible_install | dirname }}/export.{{ inventory_hostname }}.mqsc"
+      result: "{{ ansible_install | dirname }}/{{ ansible_install | basename }}"
+  - name: "[Hosts] template"
+    action:
+      module: "template"
+      src: "{{ ansible_install | dirname }}/{{ ansible_install | basename }}"
+      dest: "{{ ansible_user_dir }}/{{ ansible_install | basename }}"
+      follow: "true"
+
+  - name: "[Hosts] raw"
+    action:
+      module: "raw"
+      _raw_params: "{{ ((ansible_os_family in ['Windows'])) | ternary('[System.Console]::OutputEncoding = [System.Text.Encoding]::GetEncoding(866); $PSDefaultParameterValues[\"*:Encoding\"] = \"default\"; [System.Console]::InputEncoding = [System.Text.Encoding]::GetEncoding(866);', '') }} cat {{ ansible_user_dir }}/{{ ansible_install | basename }} | runmqsc -w 60 -m {{ ansible_manager }} {{ ansible_remote }} | tee {{ ansible_user_dir }}/report.{{ inventory_hostname }}.txt"
+  - name: "[Hosts] fetch"
+    action:
+      module: "fetch"
+      src: "{{ ansible_user_dir }}/report.{{ inventory_hostname }}.txt"
+      dest: "{{ playbook_dir }}/report.{{ inventory_hostname }}.txt"
+      flat: "true"
+  when:
+  - "((distrib['stat']['exists']))"

@@ -1,0 +1,38 @@
+---
+- name: "mq_modify"
+  block:
+  - name: "[Hosts] file"
+    action:
+      module: "{{ ((ansible_os_family in ['Windows'])) | ternary('win_file', 'file') }}"
+      path: "{{ ansible_user_dir }}/update.{{ inventory_hostname }}.mqsc"
+      state: "absent"
+  - name: "[Hosts] lineinfile"
+    action:
+      module: "{{ ((ansible_os_family in ['Windows'])) | ternary('win_lineinfile', 'lineinfile') }}"
+      path: "{{ ansible_user_dir }}/update.{{ inventory_hostname }}.mqsc"
+      line: "{{ item['type'] | upper }} {{ item['class'] | upper }}('{{ item['object'] }}') {{ item['config'] | join(' ') | trim }}"
+      state: "present"
+      create: "true"
+    loop: "{{ ansible_policy | default(list()) }}"
+    loop_control:
+      loop_var: "item"
+    when:
+    - "((ansible_policy is sequence))"
+    - "((not(ansible_policy is mapping)))"
+  when:
+  - "((ansible_policy is sequence))"
+
+- name: "mq_modify"
+  block:
+  - name: "[Hosts] raw"
+    action:
+      module: "raw"
+      _raw_params: "{{ ((ansible_os_family in ['Windows'])) | ternary('[System.Console]::OutputEncoding = [System.Text.Encoding]::GetEncoding(866); $PSDefaultParameterValues[\"*:Encoding\"] = \"default\"; [System.Console]::InputEncoding = [System.Text.Encoding]::GetEncoding(866);', '') }} cat {{ ansible_user_dir }}/update.{{ inventory_hostname }}.mqsc | runmqsc -w 60 -m {{ ansible_manager }} {{ ansible_remote }} | tee {{ ansible_user_dir }}/report.{{ inventory_hostname }}.txt"
+  - name: "[Hosts] fetch"
+    action:
+      module: "fetch"
+      src: "{{ ansible_user_dir }}/report.{{ inventory_hostname }}.txt"
+      dest: "{{ playbook_dir }}/report.{{ inventory_hostname }}.txt"
+      flat: "true"
+  when:
+  - "((ansible_policy is sequence))"

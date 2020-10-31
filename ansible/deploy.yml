@@ -1,0 +1,7 @@
+---
+- name: "Deploy MQ."
+  hosts: "IGW"
+  serial: "15"
+  gather_facts: "true"
+  roles:
+  - role: "mq-deploy"

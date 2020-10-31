@@ -1,0 +1,30 @@
+#*******************************************************************#
+#* Module Name: qm.ini                                             *#
+#* Type       : WebSphere MQ queue manager configuration file      *#
+#  Function   : Define the configuration of a single queue manager *#
+#*                                                                 *#
+#*******************************************************************#
+#* Notes      :                                                    *#
+#* 1) This file defines the configuration of the queue manager     *#
+#*                                                                 *#
+#*******************************************************************#
+InstanceData:
+   Startup=1
+Log:
+   LogPrimaryFiles=8
+   LogSecondaryFiles=4
+   LogFilePages=16384
+   LogType=CIRCULAR
+   LogBufferPages=0
+   LogWriteIntegrity=TripleWrite
+SSL:
+   AllowSSLV3=Y
+   AllowTLSV1=Y
+   OCSPAuthentication=OPTIONAL
+   OCSPCheckExtensions=NO
+   AllowWeakCipherSpec=ALL
+CHANNELS:
+   MaxChannels=5000
+   PasswordProtection=OPTIONAL
+TCP:
+   KeepAlive=YES

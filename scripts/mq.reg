@@ -1,0 +1,6 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\Tcpip\Parameters]
+"KeepAliveInterval"=dword:000249f0
+"KeepAliveTime"=dword:006ddd00
+"TcpMaxDataRetransmissions"=dword:00000005

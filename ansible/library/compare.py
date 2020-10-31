@@ -14,10 +14,11 @@ def mqsc2split(string):
 
     element = str()
     for line in string.splitlines():
-        element += (str(line.decode("cp866").encode("utf-8")) + str("\n")) if((not(line.strip().startswith("*")))) else (str())
+        element += (str(line.decode("cp866").encode("utf-8"))) if((not(line.decode("cp866").encode("utf-8").strip().startswith("*")))) else (str())
+        element += str("\n")
 
     result = list()
-    for (i_item, item) in enumerate(re.compile("(((((\s*)(.*?)(\s*))(((\s*)([+])(\s*))|((\s*)([-])(\s*))))*)(((\s*)(.*?)(\s*))(((\s*)(\n)(\s*))|((\s*)($)(\s*)))))").findall(element.strip())):
+    for (i_item, item) in enumerate(re.compile("(((((\s*)(.*?)(\s*))(((\s*)([+])(\s*))|((\s*)([-])(\s*))))*)(((\s*)(.*?)(\s*))(((\s*)(\n)(\s*)))))").findall(element.strip())):
         if((not(element.strip() in [str()]))):
             result.append(item[0].strip())
 
@@ -28,7 +29,8 @@ def mqsc2list(string):
 
     element = str()
     for line in string.splitlines():
-        element += (str(line.decode("cp866").encode("utf-8")) + str(" ")) if((not(line.strip().endswith("+")))) else (str(line.replace("+", "").strip()) + str(" "))
+        element += (str(line.decode("cp866").encode("utf-8"))) if((not(line.decode("cp866").encode("utf-8").strip().endswith("+")))) else (str(line.decode("cp866").encode("utf-8").replace("+", "").strip()))
+        element += str(" ")
 
     result = list()
     for (i_item, item) in enumerate(re.compile("((((\s*)(\w*)(\s*))|((\s*)(\d*)(\s*)))((((\s*)([(])(\s*))(((\s*)(['])(.*?)(['])(\s*))|((\s*)(.*?)(\s*)))((\s*)([)])(\s*)))?))").findall(element.strip())):

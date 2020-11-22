@@ -1,2 +1,9 @@
 # MQ
-This repository contains Ansible module to deploy MQ.
+This repository contains:
+- Ansible module for MQ deploy with playbooks.
+- Scripts for creation and initial setup MQ Queue Manager.
+
+Ansible module has features:
+- Creates dump of MQ Queue Manager.
+- Compares configuration to be deployed with created dump.
+- Only differences will be deployed, so the current configuration will not be overwritten.

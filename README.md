@@ -6,4 +6,4 @@ This repository contains:
 Ansible module has features:
 - Creates dump of MQ Queue Manager.
 - Compares configuration to be deployed with created dump.
-- Only differences will be deployed, so the current configuration will not be overwritten.
+- Only differences will be deployed, so the current configuration (such as IP-addresses on different types of MQ Channels) will not be overwritten.

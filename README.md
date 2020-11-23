@@ -1,6 +1,6 @@
 # MQ
 This repository contains:
-- Ansible module for MQ deploy with playbooks.
+- Ansible playbook for IBM MQ deploy.
 - Scripts for creation and initial setup MQ Queue Manager.
 
 Ansible module has features:
